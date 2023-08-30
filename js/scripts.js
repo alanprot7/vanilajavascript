@@ -82,8 +82,6 @@ const getSearchedTodos = (search) => {
 
     todo.style.display = "flex";
 
-    console.log(todoTitle);
-
     if (!todoTitle.includes(search)) {
       todo.style.display = "none";
     }
@@ -97,7 +95,7 @@ const checkUniqueTodo = (text) => {
   todos.forEach((todo) => {
     const todoTitle = todo.querySelector("h3").innerText.toLowerCase()
 
-    if (todoTitle == text.toLowerCase()) {
+    if (!compareArray(convertSpace(todoTitle), convertSpace(text.toLowerCase()))) {
         unique = false
     }
   })
@@ -262,8 +260,6 @@ const removeTodoLocalStorage = (todoText) => {
   const todos = getTodosLocalStorage();
 
   const filteredTodos = todos.filter((todo) => compareArray(convertSpace(todo.text), convertSpace(todoText)));
-
-  console.log(filteredTodos)
 
   localStorage.setItem("todos", JSON.stringify(filteredTodos));
 };
