@@ -14,13 +14,13 @@ let oldInputValue;
 // Funções
 const saveTodo = (text, done = 0, save = 1) => {
   
-  if(checkUniqueTodo(text.trim())) {
+  if(checkUniqueTodo(text)) {
 
     const todo = document.createElement("div");
     todo.classList.add("todo");
   
     const todoTitle = document.createElement("h3");
-    todoTitle.innerText = text.trim();
+    todoTitle.innerHTML = transformSpace(text);
     todo.appendChild(todoTitle);
   
     const doneBtn = document.createElement("button");
@@ -65,7 +65,7 @@ const updateTodo = (text) => {
   todos.forEach((todo) => {
     let todoTitle = todo.querySelector("h3");
 
-    if (todoTitle.innerText === oldInputValue) {
+    if (!compareArray(convertSpace(todoTitle.innerText), convertSpace(oldInputValue))) {
       todoTitle.innerText = text;
 
       // Utilizando dados da localStorage
@@ -102,6 +102,27 @@ const checkUniqueTodo = (text) => {
     }
   })
   return unique
+}
+
+const transformSpace = (text) => {
+  result = text.replaceAll(" ", "&nbsp;")
+  return result
+}
+
+const convertSpace = (text) => {
+  result = text.split('')
+  arrayChar= result.map((x) => {
+    code = x.charCodeAt(0)
+    if (code == 160){
+      code = 32
+    }
+    return code
+  })
+  return arrayChar
+}
+
+const compareArray = (array1, array2) => {
+  return JSON.stringify(array1) != JSON.stringify(array2)
 }
 
 const filterTodos = (filterValue) => {
@@ -240,7 +261,9 @@ const saveTodoLocalStorage = (todo) => {
 const removeTodoLocalStorage = (todoText) => {
   const todos = getTodosLocalStorage();
 
-  const filteredTodos = todos.filter((todo) => todo.text != todoText);
+  const filteredTodos = todos.filter((todo) => compareArray(convertSpace(todo.text), convertSpace(todoText)));
+
+  console.log(filteredTodos)
 
   localStorage.setItem("todos", JSON.stringify(filteredTodos));
 };
@@ -249,7 +272,7 @@ const updateTodoStatusLocalStorage = (todoText) => {
   const todos = getTodosLocalStorage();
 
   todos.map((todo) =>
-    todo.text === todoText ? (todo.done = !todo.done) : null
+  !compareArray(convertSpace(todo.text), convertSpace(todoText)) ? (todo.done = !todo.done) : null
   );
 
   localStorage.setItem("todos", JSON.stringify(todos));
@@ -259,7 +282,7 @@ const updateTodoLocalStorage = (todoOldText, todoNewText) => {
   const todos = getTodosLocalStorage();
 
   todos.map((todo) =>
-    todo.text === todoOldText ? (todo.text = todoNewText) : null
+  !compareArray(convertSpace(todo.text), convertSpace(todoOldText)) ? (todo.text = todoNewText) : null
   );
 
   localStorage.setItem("todos", JSON.stringify(todos));
